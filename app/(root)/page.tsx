@@ -3,7 +3,7 @@ import sampleData from "@/db/sample-data";
 export default async function Home() {
   return (
    <>
-    <ProductList title="Newest Arrivals" data={sampleData.products} limit={5} />
+    <ProductList title="Newest Arrivals" data={sampleData.products} limit={4} />
    </>
   );
 }
