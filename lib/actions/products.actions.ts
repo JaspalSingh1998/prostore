@@ -15,3 +15,16 @@ export const getLatestProducts = async () => {
 
   return convertToPlainObject(data);
 };
+
+// Get Single Product
+export async function getProductBySlug(slug: string) {
+  const primsa = new PrismaClient();
+
+  const data = await primsa.product.findUnique({
+    where: {
+      slug,
+    },
+  });
+
+  return convertToPlainObject(data);
+}
