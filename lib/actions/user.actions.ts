@@ -12,20 +12,18 @@ export async function signInWithCredentials(
 ) {
   try {
     const user = signInFormSchema.parse({
-      email: formData.get("email"),
-      password: formData.get("password"),
+      email: formData.get('email'),
+      password: formData.get('password'),
     });
-    await signIn("credentials", user);
-    return {
-      sucess: true,
-      message: "Signed in successfully",
-    };
+
+    await signIn('credentials', user);
+
+    return { success: true, message: 'Signed in successfully' };
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
     }
-
-    return { success: "false", message: "Invalid email or password" };
+    return { success: false, message: 'Invalid email or password' };
   }
 }
 

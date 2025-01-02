@@ -9,11 +9,24 @@ import { APP_NAME } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
 import CredentialsSignInForm from "./credentials-signin-form";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 
 export const metadata = {
   title: "Sign in",
 };
-const SignInPage = () => {
+const SignInPage = async (params: { searchParams: {
+  callbackUrl: string
+} }) => {
+
+  const {callbackUrl} = params.searchParams
+
+  const session = await auth();
+
+  if(session) {
+    return redirect(callbackUrl || "/")
+  }
+
   return (
     <div className="w-full max-w-md mx-auto">
       <Card>
