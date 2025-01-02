@@ -15,11 +15,11 @@ import { auth } from "@/auth";
 export const metadata = {
   title: "Sign in",
 };
-const SignInPage = async (params: { searchParams: {
-  callbackUrl: string
-} }) => {
+const SignInPage = async (props: {
+  searchParams: Promise<{ callbackUrl: string }>
+}) => {
 
-  const {callbackUrl} = params.searchParams
+  const {callbackUrl} = await props.searchParams
 
   const session = await auth();
 
