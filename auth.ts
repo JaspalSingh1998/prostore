@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/db/prisma";
 import { compareSync } from "bcrypt-ts-edge";
+import { NextResponse } from "next/server";
 
 export const config = {
   pages: {
@@ -59,25 +60,51 @@ export const config = {
       return session;
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-    async jwt({token, user, trigger, session}: any) {
+    async jwt({ token, user, trigger, session }: any) {
       // Assign userfields to token
       if (user) {
         token.role = user.role;
 
         // if user has no name then use email
-        if (user.name === 'NO_NAME') {
+        if (user.name === "NO_NAME") {
           token.name = user.email!.split("@")[0];
 
           // Update database to reflect the token name
           await prisma.user.update({
-            where: {id: user.id},
-            data: {name: token.name}
-          })
+            where: { id: user.id },
+            data: { name: token.name },
+          });
         }
       }
 
-      return token
-    }
+      return token;
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+    authorized({ request, auth }: any) {
+      if (!request.cookies.get("sessionCartId")) {
+        const sessionCartId = crypto.randomUUID();
+
+        // Clone the request headers
+        const newRequestHeaders = new Headers(request.headers);
+
+        // Create new response and add the new headers
+
+        const response = NextResponse.next({
+          request: {
+            headers: newRequestHeaders,
+          },
+        });
+
+        // Set newly generated sessionCartId in the response cookies
+        response.cookies.set("sessionCartId", sessionCartId);
+
+        return response;
+
+        return true;
+      } else {
+        return true;
+      }
+    },
   },
 } satisfies NextAuthConfig;
 
