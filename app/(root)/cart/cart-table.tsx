@@ -57,6 +57,7 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                           width={50}
                           height={50}
                         />
+                        <span className="px-2">{item.name}</span>
                       </Link>
                     </TableCell>
                     <TableCell className="flex-center gap-2">
