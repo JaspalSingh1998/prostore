@@ -1,7 +1,7 @@
 "use server";
 
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { formatError } from "../utils";
+import { convertToPlainObject, formatError } from "../utils";
 import { auth } from "@/auth";
 import { getMyCart } from "./cart.actions";
 import { getUserById } from "./user.actions";
@@ -14,35 +14,35 @@ import { CartItem } from "@/types";
 export async function createOrder() {
   try {
     const session = await auth();
-    if (!session) throw new Error('User is not authenticated');
+    if (!session) throw new Error("User is not authenticated");
 
     const cart = await getMyCart();
     const userId = session?.user?.id;
-    if (!userId) throw new Error('User not found');
+    if (!userId) throw new Error("User not found");
 
     const user = await getUserById(userId);
 
     if (!cart || cart.items.length === 0) {
       return {
         success: false,
-        message: 'Your cart is empty',
-        redirectTo: '/cart',
+        message: "Your cart is empty",
+        redirectTo: "/cart",
       };
     }
 
     if (!user.address) {
       return {
         success: false,
-        message: 'No shipping address',
-        redirectTo: '/shipping-address',
+        message: "No shipping address",
+        redirectTo: "/shipping-address",
       };
     }
 
     if (!user.paymentMethod) {
       return {
         success: false,
-        message: 'No payment method',
-        redirectTo: '/payment-method',
+        message: "No payment method",
+        redirectTo: "/payment-method",
       };
     }
 
@@ -86,15 +86,33 @@ export async function createOrder() {
       return insertedOrder.id;
     });
 
-    if (!insertedOrderId) throw new Error('Order not created');
+    if (!insertedOrderId) throw new Error("Order not created");
 
     return {
       success: true,
-      message: 'Order created',
+      message: "Order created",
       redirectTo: `/order/${insertedOrderId}`,
     };
   } catch (error) {
     if (isRedirectError(error)) throw error;
     return { success: false, message: formatError(error) };
   }
+}
+
+// Get order by id
+export async function getOrderById(orderId: string) {
+  const data = await prisma.order.findFirst({
+    where: { id: orderId },
+    include: {
+      OrderItem: true,
+      user: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  return convertToPlainObject(data);
 }
