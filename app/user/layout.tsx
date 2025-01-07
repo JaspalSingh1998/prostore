@@ -4,10 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import MainNav from "./main-nav";
 
-export const metadata = {
-  title: `User | ${APP_NAME}`,
-};
-
 export default function UserLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
